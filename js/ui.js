@@ -1,0 +1,13 @@
+/* ui.js — 页面导航、时钟、主屏渲染 */
+function tick(){var n=new Date();var t=pad(n.getHours())+':'+pad(n.getMinutes());document.getElementById('stime').textContent=t;document.getElementById('ctime').textContent=t;var days=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];document.getElementById('cdate').textContent=(n.getMonth()+1)+'月'+n.getDate()+'日 '+days[n.getDay()];}
+function goTo(id){var cur=S.pageStack[S.pageStack.length-1];if(cur===id)return;var existIdx=S.pageStack.indexOf(id);if(existIdx>=0){while(S.pageStack.length>existIdx+1){var p=S.pageStack.pop();document.getElementById(p).className='pg pg-app right';}document.getElementById(id).className='pg pg-app show';}else{document.getElementById(cur).className='pg '+(cur==='pg-home'?'pg-home':'pg-app')+' left';document.getElementById(id).className='pg pg-app show';S.pageStack.push(id);}}
+function goHome(){while(S.pageStack.length>1){var cur=S.pageStack.pop();document.getElementById(cur).className='pg pg-app right';}document.getElementById('pg-home').className='pg pg-home show';}
+async function renderHome(){var grid=document.getElementById('icons-grid');var dock=document.getElementById('dock');var ci=await getConfig('customIcons',{});var gridA=APPS.filter(function(a){return!a.dock});var dockA=APPS.filter(function(a){return a.dock});grid.innerHTML=gridA.map(function(a){return'<div class="app-ico" data-id="'+a.id+'"><button class="ico-del" onclick="event.stopPropagation()">✕</button><div class="ico-box '+a.cls+'">'+(ci[a.id]?'<img src="'+ci[a.id]+'">':a.emoji)+'</div><div class="ico-lbl">'+a.label+'</div></div>';}).join('');dock.innerHTML=dockA.map(function(a){return'<div class="app-ico" data-id="'+a.id+'"><div class="ico-box '+a.cls+'">'+(ci[a.id]?'<img src="'+ci[a.id]+'">':a.emoji)+'</div><div class="ico-lbl">'+a.label+'</div></div>';}).join('');grid.onclick=dock.onclick=function(e){if(S.editMode)return;var ico=e.target.closest('.app-ico[data-id]');if(!ico)return;var app=APPS.find(function(a){return a.id===ico.dataset.id});if(app)app.action();};}
+var lpt=null;
+function enterEdit(){S.editMode=true;document.getElementById('icons-grid').classList.add('edit-mode');document.getElementById('edit-bar').classList.add('show');if(navigator.vibrate)navigator.vibrate(35);}
+function exitEdit(){S.editMode=false;document.getElementById('icons-grid').classList.remove('edit-mode');document.getElementById('edit-bar').classList.remove('show');}
+function openSh(id){document.getElementById(id).classList.add('show')}
+function closeSh(id){document.getElementById(id).classList.remove('show')}
+function openHSh(id){document.getElementById(id).classList.add('show')}
+function setTg(id,v){document.getElementById(id).classList.toggle('on',!!v)}
+function tgTog(id){document.getElementById(id).classList.toggle('on')}

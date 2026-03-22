@@ -1,0 +1,9 @@
+{
+  "name": "MyPocket",
+  "short_name": "MyPocket",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f3460",
+  "theme_color": "#0f3460",
+  "orientation": "portrait"
+}
