@@ -16,10 +16,10 @@
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#0f3460;font-family:'Noto Sans SC',-apple-system,sans-serif;user-select:none;-webkit-user-select:none}
 input,textarea,select{user-select:text;-webkit-user-select:text}
 *{scrollbar-width:none}::-webkit-scrollbar{display:none}
-.pg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.25,.46,.45,.94);will-change:transform;overflow:hidden;-webkit-backface-visibility:hidden}
-.pg.show{transform:translateX(0);pointer-events:all;opacity:1}
-.pg.right{transform:translateX(100%);pointer-events:none}
-.pg.left{transform:translateX(-20%);pointer-events:none;opacity:.55}
+.pg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;transition:transform .3s ease;will-change:transform;overflow:hidden;transform:translateZ(0);-webkit-transform:translateZ(0)}
+.pg.show{transform:translate3d(0,0,0);pointer-events:all;opacity:1}
+.pg.right{transform:translate3d(100%,0,0);pointer-events:none}
+.pg.left{transform:translate3d(-20%,0,0);pointer-events:none;opacity:.5}
 .pg-home{background:transparent}
 .pg-app{background:#f5f5f7}
 #wp{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;background:linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);background-size:cover;background-position:center;pointer-events:none}
@@ -59,7 +59,7 @@ input,textarea,select{user-select:text;-webkit-user-select:text}
 .hdr-title{font-size:17px;font-weight:600;flex:1;color:#1c1c1e}
 .hdr-back{background:none;border:none;color:#7c3aed;font-size:22px;cursor:pointer;padding:4px 6px;line-height:1;font-family:'Noto Sans SC',sans-serif}
 .hdr-btn{background:none;border:none;color:#7c3aed;font-size:15px;cursor:pointer;padding:4px 6px;font-family:'Noto Sans SC',sans-serif}
-.body{flex:1;overflow-y:auto;background:#f5f5f7}
+.body{flex:1;overflow-y:auto;overflow-x:hidden;background:#f5f5f7}
 .btabs{height:calc(56px + env(safe-area-inset-bottom));display:flex;border-top:1px solid #e5e5ea;background:#fff;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
 .btab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#aeaeb2;font-family:'Noto Sans SC',sans-serif;font-size:10px;transition:color .2s}
 .btab .bi{font-size:22px}
@@ -223,9 +223,9 @@ input[type=range]{width:100%;accent-color:#007aff}
 input[type=file]{display:none}
 .sum-item{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #e5e5ea;margin-bottom:10px;position:relative}
 .sum-del{position:absolute;top:8px;right:8px;background:none;border:none;color:#aeaeb2;font-size:14px;cursor:pointer}
-.msg-menu{position:absolute;z-index:200;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.18);padding:6px 0;min-width:120px;display:none}
+.msg-menu{position:absolute;z-index:200;background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.2);min-width:200px;max-width:320px;display:none;left:50%;transform:translateX(-50%)}
 .msg-menu.show{display:block}
-.msg-menu-item{padding:10px 16px;font-size:14px;color:#1c1c1e;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Noto Sans SC',sans-serif}
+.msg-menu-item{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:56px;height:56px;font-size:12px;color:#1c1c1e;cursor:pointer;border-radius:8px;gap:2px;font-family:'Noto Sans SC',sans-serif;text-align:center}
 .msg-menu-item:active{background:#f0f0f2}
 .msg-menu-item.danger{color:#ef4444}
 .mrow.selected{opacity:.6}
@@ -848,7 +848,7 @@ function hKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}}
 function autoR(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px'}
 
 /* ====== MESSAGE ACTIONS (long-press) ====== */
-var msgLpt=null,multiMode=false,multiSel=[];
+var msgLpt=null,multiMode=false,multiSel=[],msgTouchMoved=false;
 (function(){
   document.addEventListener('DOMContentLoaded',function(){
     var msgs=document.getElementById('msgs');
@@ -857,14 +857,17 @@ var msgLpt=null,multiMode=false,multiSel=[];
       if(multiMode)return;
       var row=e.target.closest('.mrow[data-idx]');
       if(!row)return;
+      msgTouchMoved=false;
       msgLpt=setTimeout(function(){
-        if(navigator.vibrate)navigator.vibrate(25);
+        if(msgTouchMoved)return;
+        e.preventDefault();
+        if(navigator.vibrate)navigator.vibrate(30);
         showMsgMenu(row);
-      },500);
-    },{passive:true});
+      },600);
+    },{passive:false});
     msgs.addEventListener('touchend',function(){clearTimeout(msgLpt)},{passive:true});
-    msgs.addEventListener('touchmove',function(){clearTimeout(msgLpt)},{passive:true});
-    document.addEventListener('click',function(e){
+    msgs.addEventListener('touchmove',function(){msgTouchMoved=true;clearTimeout(msgLpt)},{passive:true});
+    document.addEventListener('touchstart',function(e){
       var m=document.getElementById('msg-menu');
       if(m&&m.classList.contains('show')&&!m.contains(e.target)){m.classList.remove('show')}
     });
@@ -876,17 +879,23 @@ function showMsgMenu(row){
   var m=c.messages[idx];if(!m)return;
   var menu=document.getElementById('msg-menu');
   var isText=!m.type||m.type==='text';
-  var html='';
+  var html='<div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px">';
   if(isText) html+='<div class="msg-menu-item" onclick="editMsg('+idx+')">✏️ 编辑</div>';
+  html+='<div class="msg-menu-item" onclick="copyMsg('+idx+')">📋 复制</div>';
+  html+='<div class="msg-menu-item danger" onclick="delMsg('+idx+')">🗑 删除</div>';
+  if(m.role==='user') html+='<div class="msg-menu-item" onclick="recallMsg('+idx+')">↩️ 撤回</div>';
   html+='<div class="msg-menu-item" onclick="quoteMsg('+idx+')">💬 引用</div>';
   html+='<div class="msg-menu-item" onclick="enterMulti('+idx+')">☑️ 多选</div>';
-  html+='<div class="msg-menu-item danger" onclick="delMsg('+idx+')">🗑 删除</div>';
+  html+='<div class="msg-menu-item" onclick="document.getElementById(\'msg-menu\').classList.remove(\'show\')">取消</div>';
+  html+='</div>';
   menu.innerHTML=html;
   var rect=row.getBoundingClientRect();
   var convRect=document.getElementById('pg-conv').getBoundingClientRect();
-  menu.style.top=Math.min(rect.bottom-convRect.top,convRect.height-180)+'px';
-  menu.style.left=row.classList.contains('me')?'auto':'14px';
-  menu.style.right=row.classList.contains('me')?'14px':'auto';
+  var top=rect.top-convRect.top-10;
+  if(top<60)top=rect.bottom-convRect.top+5;
+  if(top>convRect.height-200)top=convRect.height-200;
+  menu.style.top=top+'px';
+  menu.style.left='50%';menu.style.right='auto';menu.style.transform='translateX(-50%)';
   menu.classList.add('show');
 }
 function editMsg(idx){
@@ -896,6 +905,18 @@ function editMsg(idx){
   var txt=prompt('编辑消息：',m.content);
   if(txt===null)return;
   m.content=txt;save();renderMsgs();toast('已编辑');
+}
+function copyMsg(idx){
+  document.getElementById('msg-menu').classList.remove('show');
+  var c=getChar();if(!c)return;
+  var m=c.messages[idx];if(!m)return;
+  if(navigator.clipboard){navigator.clipboard.writeText(m.content).then(function(){toast('已复制')});}
+  else{var ta=document.createElement('textarea');ta.value=m.content;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('已复制');}
+}
+function recallMsg(idx){
+  document.getElementById('msg-menu').classList.remove('show');
+  var c=getChar();if(!c)return;
+  c.messages.splice(idx,1);save();renderMsgs();toast('已撤回');
 }
 function delMsg(idx){
   document.getElementById('msg-menu').classList.remove('show');
@@ -947,6 +968,7 @@ function multiDel(){
 function showHeartPanel(){
   document.getElementById('heart-ov').classList.add('show');
   renderHeartHist();
+  genHeart(); // Auto-generate on open
 }
 function closeHeartPanel(){document.getElementById('heart-ov').classList.remove('show')}
 async function genHeart(){
@@ -979,18 +1001,16 @@ function delHeartItem(idx){
 
 
 async function sendMsg(){var inp=document.getElementById('cinput');var text=inp.value.trim();if(!text)return;var c=getChar();if(!c)return;inp.value='';inp.style.height='auto';if(!c.messages)c.messages=[];c.messages.push({role:'user',content:text,t:Date.now()});addBub('me',text,'text');save();}
-async function charReply(){var c=getChar();if(!c)return;var key=getKey();if(!key){toast('请先配置API Key');return}document.getElementById('btn-reply').disabled=true;document.getElementById('btn-send').disabled=true;showTyp();document.getElementById('cs').textContent='正在输入...';try{var sys=buildSys(c);var msgs=(!c.messages||!c.messages.length)?[{role:'user',content:'（你们刚建立了联系，用最符合你性格的方式打个招呼，随意一点，就像真实发消息一样）'}]:(c.messages.slice(-(c.ctx||20))).map(function(m){return{role:m.role,content:m.content}});await sleep(400+Math.random()*1400);var reply=await callAPI(sys,msgs,4096);hideTyp();document.getElementById('cs').textContent=c.status||'在线';// Split reply into multiple bubbles (split on blank lines or paragraph breaks)
+async function charReply(){var c=getChar();if(!c)return;var key=getKey();if(!key){toast('请先配置API Key');return}document.getElementById('btn-reply').disabled=true;document.getElementById('btn-send').disabled=true;showTyp();document.getElementById('cs').textContent='正在输入...';try{var sys=buildSys(c);var msgs=(!c.messages||!c.messages.length)?[{role:'user',content:'（你们刚建立了联系，用最符合你性格的方式打个招呼，随意一点，就像真实发消息一样）'}]:(c.messages.slice(-(c.ctx||20))).map(function(m){return{role:m.role,content:m.content}});await sleep(400+Math.random()*1400);var reply=await callAPI(sys,msgs,4096);hideTyp();document.getElementById('cs').textContent=c.status||'在线';
 var parts=reply.split(/\n{2,}/).map(function(p){return p.trim()}).filter(function(p){return p.length>0});
-if(parts.length<=1){
-  c.messages.push({role:'assistant',content:reply,t:Date.now()});
-  addBub('them',reply,'text');
-} else {
-  // Show each part as separate bubble with small delay
-  c.messages.push({role:'assistant',content:reply,t:Date.now()});
-  parts.forEach(function(part,i){
-    setTimeout(function(){addBub('them',part,'text');},i*300);
-  });
-}if(c.memOn&&c.autoSum&&c.messages.length%(c.sumCt||50)===0)doAutoSum(c);save();}catch(e){hideTyp();document.getElementById('cs').textContent=c.status||'在线';toast('失败：'+e.message);}document.getElementById('btn-reply').disabled=false;document.getElementById('btn-send').disabled=false;}
+if(parts.length<=1){parts=[reply];}
+// Store EACH part as separate message so they persist as separate bubbles
+var baseT=Date.now();
+parts.forEach(function(part,i){
+  c.messages.push({role:'assistant',content:part,t:baseT+i});
+  setTimeout(function(){addBub('them',part,'text',{},c.messages.length-1);scrollM();},i*350);
+});
+if(c.memOn&&c.autoSum&&c.messages.length%(c.sumCt||50)===0)doAutoSum(c);save();}catch(e){hideTyp();document.getElementById('cs').textContent=c.status||'在线';toast('失败：'+e.message);}document.getElementById('btn-reply').disabled=false;document.getElementById('btn-send').disabled=false;}
 async function reroll(){var c=getChar();if(!c||!c.messages||!c.messages.length)return;while(c.messages.length&&c.messages[c.messages.length-1].role==='assistant')c.messages.pop();Array.from(document.querySelectorAll('#msgs .mrow.them')).forEach(function(r){r.remove()});save();await charReply();}
 function buildSys(c){
   var now=new Date();
