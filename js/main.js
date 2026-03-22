@@ -37,6 +37,14 @@ async function init() {
   // Setup message long press
   setupMsgLongPress();
 
+  // Setup file upload handlers
+  setupStickerUpload();
+  setupAvatarUpload();
+  setupWallpaperUpload();
+
+  // Render worldbook if on that page
+  renderWbList();
+
   // Home icon long press for edit
   var iw = document.getElementById('icons-grid');
   if (iw) {
@@ -105,6 +113,27 @@ async function init() {
     });
     e.target.value = '';
   });
+
+  // Setup sticker upload
+  setupStickerUpload();
+  setupWallpaperUpload();
+
+  // Render worldbook list
+  renderWbList();
+
+  // Event: wb add button
+  var wbAddBtn = document.getElementById('wb-add-btn');
+  if (wbAddBtn) wbAddBtn.addEventListener('click', function() { openWbEdit(null); });
+
+  // Init emoji panel with face emojis
+  loadEmoji('face', document.querySelector('.ecat'));
+
+  // Event: look page - render when navigated to
+  var lookApp = APPS.find(function(a) { return a.id === 'look'; });
+  if (lookApp) {
+    var origAction = lookApp.action;
+    lookApp.action = function() { goTo('pg-look'); renderLookPage(); };
+  }
 
   console.log('[MyPocket] v2 初始化完成 — ' + Cache.chars.length + ' 个角色');
 }

@@ -19,7 +19,7 @@ var APPS = [
   { id: 'weibo', label: '微博',    emoji: '🌸', cls: 'ic-weibo', dock: false, action: function() { toast('微博 — 开发中'); } },
   { id: 'x',     label: 'X',       emoji: '✖️', cls: 'ic-x',     dock: false, action: function() { toast('X — 开发中'); } },
   { id: 'grp',   label: '小组',    emoji: '👥', cls: 'ic-grp',   dock: false, action: function() { toast('小组 — 开发中'); } },
-  { id: 'look',  label: '外观',    emoji: '🎨', cls: 'ic-look',  dock: false, action: function() { goTo('pg-look'); } }
+  { id: 'look',  label: '外观',    emoji: '🎨', cls: 'ic-look',  dock: false, action: function() { renderLookPage(); goTo('pg-look'); } }
 ];
 
 // 壁纸预设

@@ -65,6 +65,26 @@
 <!-- 弹出面板 -->
 <div class="sh-ov" id="sh-newchar"><div class="sheet"><div class="sh-top"><span class="sh-title">新建角色</span><button class="sh-x" onclick="closeSh('sh-newchar')">✕</button></div><input class="sh-inp" id="nc-name" placeholder="输入角色姓名..."><button class="btn-p" id="create-char-btn">创建并进入设置</button></div></div>
 
+<div class="sh-ov" id="sh-emoji"><div class="sheet">
+  <div class="sh-top"><span class="sh-title">表情</span><button class="sh-x" onclick="closeSh('sh-emoji')">✕</button></div>
+  <div class="ecat-row"><button class="ecat on" onclick="loadEmoji('face',this)">😀</button><button class="ecat" onclick="loadEmoji('heart',this)">❤️</button><button class="ecat" onclick="loadEmoji('act',this)">👍</button><button class="ecat" onclick="loadEmoji('obj',this)">🌸</button><button class="ecat" onclick="loadEmoji('sticker',this)">🖼</button><button class="ecat" onclick="loadEmoji('import',this)">📥</button></div>
+  <div id="emoji-grid"></div>
+</div></div>
+
+<div class="sh-ov" id="sh-transfer"><div class="sheet">
+  <div class="sh-top"><span class="sh-title">💸 转账</span><button class="sh-x" onclick="closeSh('sh-transfer')">✕</button></div>
+  <input class="sh-inp" id="tf-amt" type="number" placeholder="金额">
+  <input class="sh-inp" id="tf-note" placeholder="备注（可选）">
+  <button class="btn-p" onclick="sendTransfer()">确认转账</button>
+</div></div>
+
+<div class="sh-ov" id="sh-order"><div class="sheet">
+  <div class="sh-top"><span class="sh-title">🍜 点外卖</span><button class="sh-x" onclick="closeSh('sh-order')">✕</button></div>
+  <textarea class="sh-inp" id="od-items" placeholder="菜品..." style="min-height:60px;resize:none"></textarea>
+  <input class="sh-inp" id="od-price" type="number" placeholder="总价">
+  <div style="display:flex;gap:8px"><button class="btn-p" onclick="sendOrder(false)" style="flex:1">下单</button><button class="btn-s" onclick="sendOrder(true)" style="flex:1">申请代付</button></div>
+</div></div>
+
 <!-- API 设置 -->
 <div class="hs-ov" id="sh-hset"><div class="hs-sheet"><div class="hs-handle"></div><div class="hs-title">设置</div><div class="hs-sec"><div class="hs-sec-t">API 配置</div><div class="hs-group"><input class="hs-inp" id="s-base" placeholder="反代地址 https://..."><input class="hs-inp" id="s-key" type="password" placeholder="API Key"><div style="display:flex;gap:8px;margin-bottom:10px"><input class="hs-inp" id="s-model" placeholder="模型名称" style="flex:1;margin-bottom:0"><button class="hs-btn sec" id="fetch-models-btn" style="width:auto;padding:0 16px;margin:0;font-size:13px">拉取</button></div><select id="model-dd" style="display:none;width:100%;padding:11px;background:#f2f2f7;border:1.5px solid #e5e5ea;border-radius:10px;font-size:14px;outline:none;margin-top:8px"><option value="">选择模型</option></select></div></div><div class="hs-sec"><div class="hs-sec-t">Temperature</div><div class="hs-group"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>随机性</span><span id="temp-val" style="color:#007aff;font-weight:600">1.0</span></div><input type="range" id="temp-sl" min="0" max="2" step="0.1" value="1.0" style="width:100%;accent-color:#007aff"></div></div><div style="padding:0 16px"><button class="hs-btn" id="save-api-btn">保存设置</button><button class="hs-btn sec" id="cancel-api-btn">取消</button></div></div></div>
 
@@ -87,7 +107,10 @@
 <script src="js/chat_render.js"></script>
 <script src="js/chat.js"></script>
 <script src="js/chat_ops.js"></script>
+<script src="js/chat_tools.js"></script>
 <script src="js/char_settings.js"></script>
+<script src="js/worldbook.js"></script>
+<script src="js/look.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

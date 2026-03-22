@@ -298,19 +298,4 @@ async function doAutoSum(c) {
   } catch (e) { console.error('Auto summary failed:', e); }
 }
 
-/* ====== Quick tools (placeholder) ====== */
-function doVoice() { toast('语音功能 — 请在输入框输入内容后发送'); }
-function doVideo() {
-  var c = getChar(); if (!c) return;
-  c.messages.push({ role: 'user', content: '[视频通话]', t: Date.now(), id: uid('m'), type: 'video' });
-  addBubble(c.messages[c.messages.length - 1], c);
-  saveCurrentChar();
-}
-function doLoc() {
-  var c = getChar(); if (!c) return;
-  var locs = ['在公司附近','在家附近','在咖啡馆','在商场'];
-  var loc = locs[Math.floor(Math.random() * locs.length)];
-  c.messages.push({ role: 'user', content: '[位置：' + loc + ']', t: Date.now(), id: uid('m'), type: 'location' });
-  addBubble(c.messages[c.messages.length - 1], c);
-  saveCurrentChar();
-}
+/* Quick tools are in chat_tools.js */
