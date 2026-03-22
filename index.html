@@ -10,8 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%;overflow:hidden;background:#0f3460}
-body{font-family:'Noto Sans SC',-apple-system,sans-serif;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;background:#0f3460;user-select:none}
+html{height:100%;height:-webkit-fill-available;overflow:hidden;background:#0f3460}
+body{font-family:'Noto Sans SC',-apple-system,sans-serif;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100%;height:100dvh;min-height:-webkit-fill-available;overflow:hidden;background:#0f3460;user-select:none;-webkit-user-select:none}
 input,textarea,select{user-select:text;-webkit-user-select:text}
 *{scrollbar-width:none}::-webkit-scrollbar{display:none}
 .pg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;transition:transform .32s cubic-bezier(.32,.72,0,1);will-change:transform;overflow:hidden}
@@ -21,14 +21,14 @@ input,textarea,select{user-select:text;-webkit-user-select:text}
 .pg-home{background:transparent}
 .pg-app{background:#f5f5f7}
 #wp{position:fixed;top:0;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;z-index:0;background:linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);background-size:cover;background-position:center;pointer-events:none}
-.h-sbar{position:absolute;top:0;left:0;right:0;height:50px;padding:14px 20px 0;display:flex;justify-content:space-between;align-items:center;z-index:10;pointer-events:none}
+.h-sbar{position:absolute;top:0;left:0;right:0;height:calc(50px + env(safe-area-inset-top));padding:calc(14px + env(safe-area-inset-top)) 20px 0;display:flex;justify-content:space-between;align-items:center;z-index:10;pointer-events:none}
 .h-sbar-time{color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;text-shadow:0 1px 6px rgba(0,0,0,.4)}
 .h-sbar-icons{display:flex;gap:6px;align-items:center}
 .h-sbar-icons svg{fill:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
-.h-clock{position:absolute;top:60px;left:0;right:0;text-align:center;z-index:5;pointer-events:none}
+.h-clock{position:absolute;top:calc(60px + env(safe-area-inset-top));left:0;right:0;text-align:center;z-index:5;pointer-events:none}
 .h-clock-t{font-size:72px;font-weight:100;color:#fff;letter-spacing:-3px;line-height:1;text-shadow:0 2px 24px rgba(0,0,0,.35)}
 .h-clock-d{font-size:16px;color:rgba(255,255,255,.82);margin-top:8px;font-weight:400;letter-spacing:.5px}
-.h-icons-wrap{position:absolute;top:210px;left:0;right:0;bottom:calc(108px + env(safe-area-inset-bottom));overflow-y:auto;padding:0 18px}
+.h-icons-wrap{position:absolute;top:calc(210px + env(safe-area-inset-top));left:0;right:0;bottom:calc(108px + env(safe-area-inset-bottom));overflow-y:auto;padding:0 18px}
 .h-icons-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 4px;padding:8px 0 16px}
 .app-ico{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative;-webkit-user-select:none}
 .ico-box{width:64px;height:64px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;transition:transform .1s}
@@ -53,7 +53,7 @@ input,textarea,select{user-select:text;-webkit-user-select:text}
 .ic-x{background:linear-gradient(145deg,#64748b,#1e293b)}
 .ic-grp{background:linear-gradient(145deg,#a78bfa,#7c3aed)}
 .ic-look{background:linear-gradient(145deg,#fbbf24,#d97706)}
-.hdr{height:54px;padding:0 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e5ea;flex-shrink:0;background:#fff}
+.hdr{height:calc(54px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e5ea;flex-shrink:0;background:#fff}
 .hdr-title{font-size:17px;font-weight:600;flex:1;color:#1c1c1e}
 .hdr-back{background:none;border:none;color:#7c3aed;font-size:22px;cursor:pointer;padding:4px 6px;line-height:1;font-family:'Noto Sans SC',sans-serif}
 .hdr-btn{background:none;border:none;color:#7c3aed;font-size:15px;cursor:pointer;padding:4px 6px;font-family:'Noto Sans SC',sans-serif}
@@ -76,7 +76,7 @@ input,textarea,select{user-select:text;-webkit-user-select:text}
 .empty-txt{font-size:14px;color:#aeaeb2;line-height:1.8}
 .fab{position:absolute;bottom:20px;right:20px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;color:#fff;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(124,58,237,.38)}
 .fab:active{transform:scale(.9)}
-.conv-hdr{height:58px;padding:0 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e5ea;flex-shrink:0;background:#fff}
+.conv-hdr{height:calc(58px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 10px 0;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e5ea;flex-shrink:0;background:#fff}
 .conv-av{width:40px;height:40px;border-radius:50%;background:#f0f0f2;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0}
 .conv-av img{width:100%;height:100%;object-fit:cover}
 .conv-name{font-size:15px;font-weight:600;color:#1c1c1e}
@@ -367,7 +367,6 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- Sheets -->
 <div class="sh-ov" id="sh-newchar"><div class="sheet"><div class="sh-top"><span class="sh-title">新建角色</span><button class="sh-x" onclick="closeSh('sh-newchar')">✕</button></div><input class="sh-inp" id="nc-name" placeholder="输入角色姓名..."><button class="btn-p" onclick="createChar()">创建并进入对话</button></div></div>
 <div class="sh-ov" id="sh-status"><div class="sheet"><div class="sh-top"><span class="sh-title">设置状态</span><button class="sh-x" onclick="closeSh('sh-status')">✕</button></div><input class="sh-inp" id="st-inp" placeholder="例：在上班、听歌中..."><div class="preset-row"><button class="preset-btn" onclick="qSt('在上班')">在上班</button><button class="preset-btn" onclick="qSt('在睡觉')">在睡觉</button><button class="preset-btn" onclick="qSt('在开车')">在开车</button><button class="preset-btn" onclick="qSt('刚下班')">刚下班</button><button class="preset-btn" onclick="qSt('听歌中')">听歌中</button><button class="preset-btn" onclick="qSt('')">清除</button></div><button class="btn-p" onclick="saveSt()">确认</button></div></div>
 <div class="sh-ov" id="sh-emoji"><div class="sheet"><div class="sh-top"><span class="sh-title">表情 / 表情包</span><button class="sh-x" onclick="closeSh('sh-emoji')">✕</button></div><div class="ecat-row"><button class="ecat on" onclick="loadE('face',this)">😂 表情</button><button class="ecat" onclick="loadE('heart',this)">❤️ 心情</button><button class="ecat" onclick="loadE('act',this)">👍 动作</button><button class="ecat" onclick="loadE('obj',this)">🌸 物件</button><button class="ecat" onclick="loadE('sticker',this)">🖼 表情包</button><button class="ecat" onclick="loadE('import',this)">🔗 批量导入</button></div><div id="eg"></div></div></div>
@@ -431,6 +430,10 @@ var pageStack = ['pg-home'];
 
 /* ====== INIT ====== */
 function init() {
+  document.addEventListener('focusout', function() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    document.body.scrollTop = 0;
+  });
   loadState(); renderHome(); renderChars(); renderNPCs(); applyWp();
   applyBubs(D.bme, D.bthem); loadE('face', document.querySelector('.ecat'));
   applyDynP(); renderDynFeed(); renderWbList();
@@ -701,9 +704,9 @@ function save(){try{localStorage.setItem('mp_data',JSON.stringify({chars:D.chars
 function loadState(){try{var r=localStorage.getItem('mp_data');if(r){var d=JSON.parse(r);Object.assign(D,d)}}catch(e){}}
 
 /* ====== UTILS ====== */
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&gt;')}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
-function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400);}
+function toast(msg){var t=document.getElementById('toast');t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2400);}
 
 init();
 </script>
