@@ -1382,6 +1382,13 @@ var APP_VERSION='v20260322';
   }
 })();
 
+// Show version briefly so user can confirm update
+var _vb=document.createElement('div');
+_vb.textContent='v7-0322';
+_vb.style.cssText='position:fixed;top:4px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#0f0;padding:2px 10px;border-radius:10px;font-size:10px;z-index:99999;pointer-events:none';
+document.body.appendChild(_vb);
+setTimeout(function(){_vb.style.transition='opacity 1s';_vb.style.opacity='0';setTimeout(function(){_vb.remove()},1200)},3000);
+
 init();
 </script>
 </body>
