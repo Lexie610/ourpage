@@ -14,14 +14,14 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#0f3460;font-family:'Noto Sans SC',-apple-system,sans-serif;user-select:none;-webkit-user-select:none}
-input,textarea,select{user-select:text;-webkit-user-select:text}
+input,textarea,select{user-select:text;-webkit-user-select:text;font-size:16px!important}
 *{scrollbar-width:none}::-webkit-scrollbar{display:none}
-.pg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;transition:transform .3s ease;will-change:transform;overflow:hidden;transform:translateZ(0);-webkit-transform:translateZ(0)}
-.pg.show{transform:translate3d(0,0,0);pointer-events:all;opacity:1}
-.pg.right{transform:translate3d(100%,0,0);pointer-events:none}
-.pg.left{transform:translate3d(-20%,0,0);pointer-events:none;opacity:.5}
+.pg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;-webkit-transition:-webkit-transform .3s ease-out;transition:transform .3s ease-out;will-change:transform;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
+.pg.show{-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);pointer-events:all;opacity:1}
+.pg.right{-webkit-transform:translate3d(100%,0,0);transform:translate3d(100%,0,0);pointer-events:none;opacity:1}
+.pg.left{-webkit-transform:translate3d(-20%,0,0);transform:translate3d(-20%,0,0);pointer-events:none;opacity:.5}
 .pg-home{background:transparent}
-.pg-app{background:#f5f5f7}
+.pg-app{background:#f5f5f7;overflow-x:hidden}
 #wp{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;background:linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);background-size:cover;background-position:center;pointer-events:none}
 .h-sbar{position:absolute;top:0;left:0;right:0;height:calc(50px + env(safe-area-inset-top));padding:calc(14px + env(safe-area-inset-top)) 20px 0;display:flex;justify-content:space-between;align-items:center;z-index:10;pointer-events:none}
 .h-sbar-time{color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;text-shadow:0 1px 6px rgba(0,0,0,.4)}
@@ -110,11 +110,11 @@ input,textarea,select{user-select:text;-webkit-user-select:text}
 #btn-send:disabled,#btn-reply:disabled{opacity:.38}
 .sg{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:14px}
 .sgt{font-size:11px;font-weight:600;color:#aeaeb2;text-transform:uppercase;letter-spacing:.06em;padding:12px 14px 6px}
-.sr{padding:11px 14px;border-bottom:1px solid #e5e5ea;display:flex;flex-direction:column;gap:6px}
+.sr{padding:11px 14px;border-bottom:1px solid #e5e5ea;display:flex;flex-direction:column;gap:6px;overflow:hidden}
 .sr.h{flex-direction:row;align-items:center}
 .sr:last-child{border-bottom:none}
 .sl{font-size:13px;color:#6e6e73}
-.si,.sta,.sse{background:#f0f0f2;border:1px solid #e5e5ea;border-radius:10px;padding:9px 12px;color:#1c1c1e;font-family:'Noto Sans SC',sans-serif;font-size:14px;outline:none;width:100%;transition:border-color .2s}
+.si,.sta,.sse{background:#f0f0f2;border:1px solid #e5e5ea;border-radius:10px;padding:9px 12px;color:#1c1c1e;font-family:'Noto Sans SC',sans-serif;font-size:16px;outline:none;width:100%;min-width:0;-webkit-appearance:none}
 .si:focus,.sta:focus{border-color:#7c3aed}
 .sta{resize:vertical;min-height:80px;line-height:1.6}
 .tg{width:44px;height:26px;border-radius:13px;background:#e5e5ea;border:none;cursor:pointer;transition:background .2s;position:relative;flex-shrink:0}
@@ -369,10 +369,12 @@ input[type=file]{display:none}
         <button onclick="closeHeartPanel()" style="background:#f0f0f2;border:none;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer;color:#6e6e73">✕</button>
       </div>
       <div id="heart-now" style="background:#f9fafb;border-radius:12px;padding:14px;margin-bottom:12px;min-height:60px">
-        <div style="font-size:12px;color:#aeaeb2;margin-bottom:6px">此刻的心声</div>
-        <div id="hv-body2" style="font-size:14px;color:#6e6e73;line-height:1.8;white-space:pre-wrap">点击下方按钮感应...</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;color:#aeaeb2">此刻的心声</span>
+          <button onclick="document.getElementById('hv-body2').textContent='正在感应中...';genHeart()" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;font-family:'Noto Sans SC',sans-serif">🔄 刷新</button>
+        </div>
+        <div id="hv-body2" style="font-size:14px;color:#6e6e73;line-height:1.8;white-space:pre-wrap">正在感应中...</div>
       </div>
-      <button onclick="genHeart()" class="btn-p" style="margin-bottom:12px">🔮 感应心声</button>
       <div style="font-size:13px;font-weight:600;color:#1c1c1e;margin-bottom:8px">历史心声</div>
       <div id="heart-hist-list"></div>
     </div>
@@ -584,12 +586,21 @@ var pageStack = ['pg-home'];
 
 /* ====== INIT ====== */
 function init() {
+  // Fix iOS keyboard pushing viewport
+  var vp=document.querySelector('meta[name=viewport]');
+  if(vp)vp.content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
   document.addEventListener('focusout', function() {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    document.body.scrollTop = 0;
+    setTimeout(function(){window.scrollTo(0,0);document.body.scrollTop=0;document.documentElement.scrollTop=0;},50);
   });
-  loadState(); renderHome(); renderChars(); renderNPCs(); applyWp();
-  applyBubs(D.bme, D.bthem); loadE('face', document.querySelector('.ecat'));
+  // Prevent iOS bounce/scroll on body
+  document.body.addEventListener('touchmove',function(e){
+    if(!e.target.closest('.body,#msgs,.sheet,.hs-sheet,.stk-grid,.h-icons-wrap,[style*="overflow"]'))e.preventDefault();
+  },{passive:false});
+
+  loadState();
+  migrateMessages(); // Split old combined messages
+  renderHome(); renderChars(); renderNPCs(); applyWp();
+  applyBubs(D.bme, D.bthem); loadE('sticker', document.querySelector('.ecat'));
   applyDynP(); renderDynFeed(); renderWbList();
   if (localStorage.getItem('mp_hide_sbar')==='1') {
     document.getElementById('stime').style.visibility='hidden';
@@ -605,6 +616,31 @@ function init() {
   document.querySelectorAll('.sh-ov,.hs-ov').forEach(function(el){
     el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('show')});
   });
+}
+
+/* ====== MIGRATE OLD MESSAGES ====== */
+function migrateMessages(){
+  var changed=false;
+  D.chars.forEach(function(c){
+    if(!c.messages||!c.messages.length)return;
+    var newMsgs=[];
+    c.messages.forEach(function(m){
+      // Split assistant messages that contain double newlines (old combined format)
+      if(m.role==='assistant'&&(!m.type||m.type==='text')&&m.content&&m.content.indexOf('\n\n')>=0){
+        var parts=m.content.split(/\n{2,}/).map(function(p){return p.trim()}).filter(function(p){return p.length>0});
+        if(parts.length>1){
+          parts.forEach(function(part,i){
+            newMsgs.push({role:'assistant',content:part,t:(m.t||Date.now())+i});
+          });
+          changed=true;
+          return;
+        }
+      }
+      newMsgs.push(m);
+    });
+    c.messages=newMsgs;
+  });
+  if(changed)save();
 }
 
 /* ====== CLOCK ====== */
@@ -814,7 +850,6 @@ function renderMsgs(){
     var ct=m.content||'';
     var tp=m.type||'';
     var ex={};
-    // If type is explicitly stored, build extra from stored fields
     if(tp==='transfer'){ex={amt:(m.extra&&m.extra.amt)||ct.replace(/[^\d.]/g,'')};ct=m.note||'转账';}
     else if(tp==='sticker'){ex={src:m.src||''};ct='';}
     else if(tp==='order'){ex=m.extra||{price:'?',pay:false};ct=ct.replace(/^\[外卖：/,'').replace(/¥.*$/,'');}
@@ -824,7 +859,6 @@ function renderMsgs(){
     else if(tp==='location'){ct=ct.replace(/^\[位置：/,'').replace(/\]$/,'');}
     else if(tp==='textimg'){ex={style:m.style||'note'};ct=ct.replace(/^\[文字图：/,'').replace(/\]$/,'');}
     else {
-      // No type stored - detect from content pattern
       tp='text';
       var match;
       if(match=ct.match(/^\[转账¥(.+)\]$/)){tp='transfer';ex={amt:match[1]};ct=m.note||'转账';}
@@ -837,6 +871,14 @@ function renderMsgs(){
       else if(match=ct.match(/^\[文字图：(.+)\]$/)){tp='textimg';ct=match[1];ex={style:m.style||'note'};}
     }
     if((tp==='sticker'||tp==='image')&&!ex.src){tp='text';ct=m.content;}
+    // Split assistant text messages with double newlines into separate bubbles
+    if(tp==='text'&&side==='them'&&ct.indexOf('\n\n')>=0){
+      var parts=ct.split(/\n{2,}/).map(function(p){return p.trim()}).filter(function(p){return p.length>0});
+      if(parts.length>1){
+        parts.forEach(function(part){addBub(side,part,'text',{},idx)});
+        return;
+      }
+    }
     addBub(side,ct,tp,ex,idx);
   });
 }
@@ -966,9 +1008,12 @@ function multiDel(){
 
 /* ====== HEART PANEL (in conv) ====== */
 function showHeartPanel(){
-  document.getElementById('heart-ov').classList.add('show');
+  var el=document.getElementById('heart-ov');
+  el.classList.add('show');
+  document.getElementById('hv-body2').textContent='正在感应中...';
   renderHeartHist();
-  genHeart(); // Auto-generate on open
+  // Auto-generate immediately
+  setTimeout(function(){genHeart()},100);
 }
 function closeHeartPanel(){document.getElementById('heart-ov').classList.remove('show')}
 async function genHeart(){
@@ -1384,7 +1429,7 @@ var APP_VERSION='v20260322';
 
 // Show version briefly so user can confirm update
 var _vb=document.createElement('div');
-_vb.textContent='v7-0322';
+_vb.textContent='v9-0322';
 _vb.style.cssText='position:fixed;top:4px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#0f0;padding:2px 10px;border-radius:10px;font-size:10px;z-index:99999;pointer-events:none';
 document.body.appendChild(_vb);
 setTimeout(function(){_vb.style.transition='opacity 1s';_vb.style.opacity='0';setTimeout(function(){_vb.remove()},1200)},3000);
