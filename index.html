@@ -235,7 +235,8 @@ input[type=file]{display:none}
 .multi-bar button{flex:1;padding:10px;border-radius:10px;border:none;font-size:14px;font-family:'Noto Sans SC',sans-serif;cursor:pointer}
 .heart-ov{position:absolute;inset:0;z-index:80;background:rgba(0,0,0,.4);display:none;align-items:flex-end}
 .heart-ov.show{display:flex}
-.heart-panel{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:70vh;overflow-y:auto;padding:20px 16px calc(20px + env(safe-area-inset-bottom));animation:sup .3s cubic-bezier(.32,.72,0,1)}
+.heart-panel{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:80vh;display:flex;flex-direction:column;padding:20px 16px 0;animation:sup .3s cubic-bezier(.32,.72,0,1)}
+.heart-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
 
 /* ══ WIDGETS ══ */
 .wg{border-radius:20px;overflow:hidden;cursor:pointer;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .1s}
@@ -364,19 +365,21 @@ input[type=file]{display:none}
   <div class="msg-menu" id="msg-menu"></div>
   <div class="heart-ov" id="heart-ov" onclick="if(event.target===this)closeHeartPanel()">
     <div class="heart-panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0">
         <span style="font-size:16px;font-weight:600;color:#1c1c1e">💭 角色心声</span>
         <button onclick="closeHeartPanel()" style="background:#f0f0f2;border:none;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer;color:#6e6e73">✕</button>
       </div>
-      <div id="heart-now" style="background:#f9fafb;border-radius:12px;padding:14px;margin-bottom:12px;min-height:60px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:12px;color:#aeaeb2">此刻的心声</span>
-          <button onclick="document.getElementById('hv-body2').textContent='正在感应中...';genHeart()" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;font-family:'Noto Sans SC',sans-serif">🔄 刷新</button>
+      <div class="heart-scroll">
+        <div id="heart-now" style="background:#f9fafb;border-radius:12px;padding:14px;margin-bottom:12px;min-height:60px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;color:#aeaeb2">此刻的心声</span>
+            <button onclick="document.getElementById('hv-body2').textContent='正在感应中...';genHeart()" style="background:none;border:none;color:#7c3aed;font-size:12px;cursor:pointer;font-family:'Noto Sans SC',sans-serif">🔄 刷新</button>
+          </div>
+          <div id="hv-body2" style="font-size:14px;color:#6e6e73;line-height:1.8;white-space:pre-wrap">正在感应中...</div>
         </div>
-        <div id="hv-body2" style="font-size:14px;color:#6e6e73;line-height:1.8;white-space:pre-wrap">正在感应中...</div>
+        <div style="font-size:13px;font-weight:600;color:#1c1c1e;margin-bottom:8px">历史心声</div>
+        <div id="heart-hist-list"></div>
       </div>
-      <div style="font-size:13px;font-weight:600;color:#1c1c1e;margin-bottom:8px">历史心声</div>
-      <div id="heart-hist-list"></div>
     </div>
   </div>
 </div>
@@ -392,16 +395,21 @@ input[type=file]{display:none}
       <div class="sr"><div class="sl">两人关系</div><input class="si" id="s-rel" placeholder="例：恋人、暗恋、青梅竹马"></div>
     </div>
     <div class="sg"><div class="sgt">角色基础信息</div>
-      <div class="sr" style="flex-direction:row;gap:8px"><div style="flex:1"><div class="sl">姓名</div><input class="si" id="s-cname2" placeholder="全名"></div><div style="flex:1"><div class="sl">性别</div><select class="si" id="s-cgender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option><option value="其他">其他</option></select></div></div>
-      <div class="sr" style="flex-direction:row;gap:8px"><div style="flex:1"><div class="sl">年龄</div><select class="si" id="s-cage"><option value="">请选择</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="30">30</option><option value="35">35</option><option value="40">40</option></select></div><div style="flex:1"><div class="sl">职业</div><input class="si" id="s-cjob" placeholder="例：大学生"></div></div>
-      <div class="sr" style="flex-direction:row;gap:8px"><div style="flex:1"><div class="sl">哪里人</div><input class="si" id="s-cfrom" placeholder="例：北京"></div><div style="flex:1"><div class="sl">现居地</div><input class="si" id="s-clive" placeholder="例：上海"></div></div>
+      <div class="sr"><div class="sl">姓名</div><input class="si" id="s-cname2" placeholder="全名"></div>
+      <div class="sr"><div class="sl">性别</div><select class="si" id="s-cgender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option><option value="其他">其他</option></select></div>
+      <div class="sr"><div class="sl">年龄</div><select class="si" id="s-cage"><option value="">请选择</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="30">30</option><option value="35">35</option><option value="40">40</option></select></div>
+      <div class="sr"><div class="sl">职业</div><input class="si" id="s-cjob" placeholder="例：大学生"></div>
+      <div class="sr"><div class="sl">哪里人</div><input class="si" id="s-cfrom" placeholder="例：北京"></div>
+      <div class="sr"><div class="sl">现居地</div><input class="si" id="s-clive" placeholder="例：上海"></div>
     </div>
     <div class="sg"><div class="sgt">角色详细人设</div>
       <div class="sr"><textarea class="sta" id="s-cdesc" rows="6" placeholder="性格特点、外貌描写、说话方式、口癖、兴趣爱好、习惯...越详细越好"></textarea></div>
     </div>
     <div class="sg"><div class="sgt">User 基础信息</div>
-      <div class="sr" style="flex-direction:row;gap:8px"><div style="flex:1"><div class="sl">我的名字</div><input class="si" id="s-uname" placeholder="你的称呼"></div><div style="flex:1"><div class="sl">性别</div><select class="si" id="s-ugender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option><option value="其他">其他</option></select></div></div>
-      <div class="sr" style="flex-direction:row;gap:8px"><div style="flex:1"><div class="sl">年龄</div><select class="si" id="s-uage"><option value="">请选择</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="30">30</option><option value="35">35</option><option value="40">40</option></select></div><div style="flex:1"><div class="sl">职业</div><input class="si" id="s-ujob" placeholder="例：大学生"></div></div>
+      <div class="sr"><div class="sl">我的名字</div><input class="si" id="s-uname" placeholder="你的称呼"></div>
+      <div class="sr"><div class="sl">性别</div><select class="si" id="s-ugender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option><option value="其他">其他</option></select></div>
+      <div class="sr"><div class="sl">年龄</div><select class="si" id="s-uage"><option value="">请选择</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="30">30</option><option value="35">35</option><option value="40">40</option></select></div>
+      <div class="sr"><div class="sl">职业</div><input class="si" id="s-ujob" placeholder="例：大学生"></div>
     </div>
     <div class="sg"><div class="sgt">User 详细人设</div>
       <div class="sr"><textarea class="sta" id="s-udesc" rows="3" placeholder="你的性格、外貌、在这段关系里的角色..."></textarea></div>
@@ -856,6 +864,7 @@ function renderMsgs(){
     else if(tp==='voice'){ex={dur:m.dur||'0:03'};ct=ct.replace(/^\[语音：/,'').replace(/\]$/,'');}
     else if(tp==='image'){ex={src:m.src||''};ct='';}
     else if(tp==='video'){ct='视频通话';}
+    else if(tp==='recall'){ct=m.content;}
     else if(tp==='location'){ct=ct.replace(/^\[位置：/,'').replace(/\]$/,'');}
     else if(tp==='textimg'){ex={style:m.style||'note'};ct=ct.replace(/^\[文字图：/,'').replace(/\]$/,'');}
     else {
@@ -882,7 +891,7 @@ function renderMsgs(){
     addBub(side,ct,tp,ex,idx);
   });
 }
-function addBub(side,content,type,extra,msgIdx){extra=extra||{};var el=document.getElementById('msgs'),ty=document.getElementById('typing');var now=new Date(),t=pad(now.getHours())+':'+pad(now.getMinutes());var row=document.createElement('div');row.className='mrow '+side;if(msgIdx!==undefined)row.dataset.idx=msgIdx;var html='';if(type==='text')html='<div class="bubble">'+esc(content)+'</div>';else if(type==='voice')html='<div class="bubble" style="display:flex;align-items:center;gap:8px">🎙 <span style="font-size:13px">「'+esc(content)+'」</span><span style="font-size:11px;opacity:.7">'+(extra.dur||'0:03')+'</span></div>';else if(type==='transfer')html='<div class="bubble" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)!important;color:#166534!important;display:flex;gap:8px;align-items:center">💰<div><div style="font-weight:600;font-size:13px">¥'+esc(extra.amt)+'</div><div style="font-size:11px;opacity:.8">'+esc(content)+'</div></div></div>';else if(type==='location')html='<div class="bubble" style="background:#eff6ff!important;color:#1d4ed8!important;display:flex;gap:8px;align-items:center">📍 '+esc(content)+'</div>';else if(type==='order')html='<div class="bubble" style="background:linear-gradient(135deg,#fff7ed,#fed7aa)!important;color:#92400e!important;flex-direction:column;display:flex;gap:4px"><div style="font-weight:600;font-size:13px">🍜 外卖订单</div><div style="font-size:13px">'+esc(content)+'</div><div style="font-size:12px;color:#dc2626">¥'+esc(extra.price)+'</div>'+(extra.pay?'<div style="font-size:11px;border-top:1px solid #fbbf24;padding-top:4px">💸 申请代付</div>':'')+'</div>';else if(type==='image')html='<div class="bubble" style="padding:0!important;background:transparent!important"><img src="'+extra.src+'" style="width:100%;max-width:220px;display:block;border-radius:18px"></div>';else if(type==='sticker')html='<div class="bubble" style="padding:0!important;background:transparent!important"><img src="'+extra.src+'" style="width:120px;height:120px;object-fit:cover;display:block;border-radius:12px"></div>';else if(type==='textimg'){var bgs={note:'#fef3c7',dark:'#1a1a2e',pink:'#fce7f3',minimal:'#f9fafb'};var tcs={note:'#78350f',dark:'#e2e8f0',pink:'#831843',minimal:'#111827'};var s2=extra.style||'note';html='<div class="bubble" style="padding:0!important;background:transparent!important"><div style="background:'+bgs[s2]+';color:'+tcs[s2]+';padding:16px;border-radius:18px;font-size:13px;line-height:1.7;text-align:center;min-width:140px">'+esc(content)+'</div></div>';}else if(type==='video')html='<div class="bubble" style="display:flex;align-items:center;gap:10px;background:#f0f9ff!important;color:#0369a1!important">📹<div><div style="font-size:13px;font-weight:500">视频通话</div><div style="font-size:11px;opacity:.7">已结束</div></div></div>';row.innerHTML=html+'<div class="mtime">'+t+(side==='me'?' · 已发送':'')+'</div>';el.insertBefore(row,ty);el.scrollTop=el.scrollHeight;}
+function addBub(side,content,type,extra,msgIdx){extra=extra||{};var el=document.getElementById('msgs'),ty=document.getElementById('typing');var now=new Date(),t=pad(now.getHours())+':'+pad(now.getMinutes());var row=document.createElement('div');row.className='mrow '+side;if(msgIdx!==undefined)row.dataset.idx=msgIdx;var html='';if(type==='text')html='<div class="bubble">'+esc(content)+'</div>';else if(type==='voice')html='<div class="bubble" style="display:flex;align-items:center;gap:8px">🎙 <span style="font-size:13px">「'+esc(content)+'」</span><span style="font-size:11px;opacity:.7">'+(extra.dur||'0:03')+'</span></div>';else if(type==='transfer')html='<div class="bubble" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)!important;color:#166534!important;display:flex;gap:8px;align-items:center">💰<div><div style="font-weight:600;font-size:13px">¥'+esc(extra.amt)+'</div><div style="font-size:11px;opacity:.8">'+esc(content)+'</div></div></div>';else if(type==='location')html='<div class="bubble" style="background:#eff6ff!important;color:#1d4ed8!important;display:flex;gap:8px;align-items:center">📍 '+esc(content)+'</div>';else if(type==='order')html='<div class="bubble" style="background:linear-gradient(135deg,#fff7ed,#fed7aa)!important;color:#92400e!important;flex-direction:column;display:flex;gap:4px"><div style="font-weight:600;font-size:13px">🍜 外卖订单</div><div style="font-size:13px">'+esc(content)+'</div><div style="font-size:12px;color:#dc2626">¥'+esc(extra.price)+'</div>'+(extra.pay?'<div style="font-size:11px;border-top:1px solid #fbbf24;padding-top:4px">💸 申请代付</div>':'')+'</div>';else if(type==='image')html='<div class="bubble" style="padding:0!important;background:transparent!important"><img src="'+extra.src+'" style="width:100%;max-width:220px;display:block;border-radius:18px"></div>';else if(type==='sticker')html='<div class="bubble" style="padding:0!important;background:transparent!important"><img src="'+extra.src+'" style="width:120px;height:120px;object-fit:cover;display:block;border-radius:12px"></div>';else if(type==='textimg'){var bgs={note:'#fef3c7',dark:'#1a1a2e',pink:'#fce7f3',minimal:'#f9fafb'};var tcs={note:'#78350f',dark:'#e2e8f0',pink:'#831843',minimal:'#111827'};var s2=extra.style||'note';html='<div class="bubble" style="padding:0!important;background:transparent!important"><div style="background:'+bgs[s2]+';color:'+tcs[s2]+';padding:16px;border-radius:18px;font-size:13px;line-height:1.7;text-align:center;min-width:140px">'+esc(content)+'</div></div>';}else if(type==='video')html='<div class="bubble" style="display:flex;align-items:center;gap:10px;background:#f0f9ff!important;color:#0369a1!important">📹<div><div style="font-size:13px;font-weight:500">视频通话</div><div style="font-size:11px;opacity:.7">已结束</div></div></div>';else if(type==='recall')html='<div style="text-align:center;font-size:12px;color:#aeaeb2;padding:6px 0">'+esc(content)+'</div>';row.innerHTML=html+(type==='recall'?'':'<div class="mtime">'+t+(side==='me'?' · 已发送':'')+'</div>');el.insertBefore(row,ty);el.scrollTop=el.scrollHeight;}
 function showTyp(){document.getElementById('typing').classList.add('show');scrollM()}
 function hideTyp(){document.getElementById('typing').classList.remove('show')}
 function scrollM(){var el=document.getElementById('msgs');el.scrollTop=el.scrollHeight}
@@ -921,14 +930,15 @@ function showMsgMenu(row){
   var m=c.messages[idx];if(!m)return;
   var menu=document.getElementById('msg-menu');
   var isText=!m.type||m.type==='text';
-  var html='<div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px">';
-  if(isText) html+='<div class="msg-menu-item" onclick="editMsg('+idx+')">✏️ 编辑</div>';
-  html+='<div class="msg-menu-item" onclick="copyMsg('+idx+')">📋 复制</div>';
-  html+='<div class="msg-menu-item danger" onclick="delMsg('+idx+')">🗑 删除</div>';
-  if(m.role==='user') html+='<div class="msg-menu-item" onclick="recallMsg('+idx+')">↩️ 撤回</div>';
-  html+='<div class="msg-menu-item" onclick="quoteMsg('+idx+')">💬 引用</div>';
-  html+='<div class="msg-menu-item" onclick="enterMulti('+idx+')">☑️ 多选</div>';
-  html+='<div class="msg-menu-item" onclick="document.getElementById(\'msg-menu\').classList.remove(\'show\')">取消</div>';
+  var who=m.role==='user'?'我':c.nick||c.real;
+  var html='<div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px;justify-content:center">';
+  if(isText) html+='<div class="msg-menu-item" onclick="editMsg('+idx+')">✏️<br>编辑</div>';
+  html+='<div class="msg-menu-item" onclick="copyMsg('+idx+')">📋<br>复制</div>';
+  html+='<div class="msg-menu-item danger" onclick="delMsg('+idx+')">🗑<br>删除</div>';
+  html+='<div class="msg-menu-item" onclick="recallMsg('+idx+')">↩️<br>撤回</div>';
+  html+='<div class="msg-menu-item" onclick="quoteMsg('+idx+')">💬<br>引用</div>';
+  html+='<div class="msg-menu-item" onclick="enterMulti('+idx+')">☑️<br>多选</div>';
+  html+='<div class="msg-menu-item" onclick="document.getElementById(\'msg-menu\').classList.remove(\'show\')">✕<br>取消</div>';
   html+='</div>';
   menu.innerHTML=html;
   var rect=row.getBoundingClientRect();
@@ -958,7 +968,13 @@ function copyMsg(idx){
 function recallMsg(idx){
   document.getElementById('msg-menu').classList.remove('show');
   var c=getChar();if(!c)return;
-  c.messages.splice(idx,1);save();renderMsgs();toast('已撤回');
+  var m=c.messages[idx];if(!m)return;
+  var who=m.role==='user'?'你':(c.nick||c.real);
+  // Replace the message with a recall notice (char can still see it was recalled)
+  m.content='['+who+'撤回了一条消息]';
+  m.type='recall';
+  m.recalled=true;
+  save();renderMsgs();toast(who+'撤回了一条消息');
 }
 function delMsg(idx){
   document.getElementById('msg-menu').classList.remove('show');
@@ -1020,8 +1036,18 @@ async function genHeart(){
   var c=getChar();if(!c)return;
   document.getElementById('hv-body2').textContent='正在感应...';
   try{
-    var recent=(c.messages||[]).slice(-8).map(function(m){return(m.role==='user'?'对方':c.real)+'：'+m.content}).join('\n')||'（无对话）';
-    var heartSys='你是"'+c.real+'"。'+(c.charDesc?'角色设定：'+c.charDesc.slice(0,600)+'\n\n':'')+'根据最近对话，输出以下五个部分，每个部分之间空一行：\n\n【当前状态栏】时间/地点/场景氛围\n\n【好感度】对用户的当前好感/情绪指数\n\n【当前服装】描述此刻穿着打扮\n\n【当前心声】第一人称内心想法\n\n【当前小心思】没说出口的想法，第一人称\n\n风格要求：符合角色人设，内容细腻，每部分认真写。';
+    var recent=(c.messages||[]).slice(-8).map(function(m){return(m.role==='user'?(c.uName||'对方'):c.real)+'：'+m.content}).join('\n')||'（无对话）';
+    // Build context with user info so AI uses correct gender/pronouns
+    var ctx='你是"'+c.real+'"。';
+    if(c.cGender) ctx+=c.real+'是'+c.cGender+'性。';
+    if(c.charDesc) ctx+='角色设定：'+c.charDesc.slice(0,600)+'\n\n';
+    ctx+='对方信息：';
+    if(c.uName) ctx+='名字叫'+c.uName+'，';
+    if(c.uGender) ctx+='性别'+c.uGender+'，';
+    if(c.rel) ctx+='你们的关系是'+c.rel+'，';
+    if(c.charNick) ctx+='你叫对方'+c.charNick+'，';
+    ctx+='\n\n';
+    var heartSys=ctx+'根据最近对话，以'+c.real+'的视角输出以下五个部分，每个部分之间空一行：\n\n【当前状态栏】时间/地点/场景氛围\n\n【好感度】对'+(c.uName||'对方')+'的当前好感/情绪指数\n\n【当前服装】描述此刻穿着打扮\n\n【当前心声】第一人称内心想法\n\n【当前小心思】没说出口的想法，第一人称\n\n风格要求：符合角色人设，内容细腻，每部分认真写。注意用正确的性别称呼对方。';
     var heart=await callAPI(heartSys,[{role:'user',content:'最近对话：\n'+recent+'\n\n请按格式输出，每部分之间空一行。'}],4096);
     document.getElementById('hv-body2').textContent=heart;
     if(!c.hearts)c.hearts=[];
@@ -1130,8 +1156,7 @@ function delHeart(i){
   loadHeartHist();
   toast('已删除');
 }
-async function loadHeart(){var c=getChar();if(!c)return;document.getElementById('hv-body').textContent='正在感应...';try{var recent=(c.messages||[]).slice(-8).map(function(m){return(m.role==='user'?'对方':c.real)+'：'+m.content}).join('\n')||'（无对话）';var heartSys='你是"'+c.real+'"。'+(c.charDesc?'角色设定：'+c.charDesc.slice(0,600)+'\n\n':'')+'根据最近对话，输出以下五个部分，每个部分之间空一行：\n\n【当前状态栏】时间/地点/场景氛围\n\n【好感度】对用户的当前好感/情绪指数\n\n【当前服装】描述此刻穿着打扮\n\n【当前心声】第一人称内心想法\n\n【当前小心思】没说出口的想法，第一人称\n\n风格要求：符合角色人设，内容细腻，每部分认真写。';
-    var heart=await callAPI(heartSys,[{role:'user',content:'最近对话：\n'+recent+'\n\n请按格式输出，每部分之间空一行。'}],4096);document.getElementById('hv-body').textContent=heart;if(!c.hearts)c.hearts=[];c.hearts.push({time:new Date().toLocaleString(),text:heart});if(c.hearts.length>50)c.hearts.shift();save();}catch(e){document.getElementById('hv-body').textContent='感应失败：'+e.message;}}
+async function loadHeart(){genHeart();}
 function loadHeartHist(){var c=getChar();if(!c)return;var el=document.getElementById('hv-hist');var h=(c.hearts||[]).slice().reverse();el.innerHTML=h.length?h.map(function(x,i){return'<div class="sum-item"><button class="sum-del" onclick="delHeart('+( h.length-1-i)+')" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#aeaeb2;font-size:16px;cursor:pointer">×</button><div style="font-size:11px;color:#aeaeb2;margin-bottom:5px">'+esc(x.time)+'</div><div style="font-size:13px;color:#6e6e73;line-height:1.7">'+esc(x.text)+'</div></div>'}).join(''):'<div class="empty-s"><div class="empty-txt">还没有心声记录</div></div>';}
 
 /* ====== CHAR SETTINGS ====== */
@@ -1429,7 +1454,7 @@ var APP_VERSION='v20260322';
 
 // Show version briefly so user can confirm update
 var _vb=document.createElement('div');
-_vb.textContent='v9-0322';
+_vb.textContent='v10-0322';
 _vb.style.cssText='position:fixed;top:4px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#0f0;padding:2px 10px;border-radius:10px;font-size:10px;z-index:99999;pointer-events:none';
 document.body.appendChild(_vb);
 setTimeout(function(){_vb.style.transition='opacity 1s';_vb.style.opacity='0';setTimeout(function(){_vb.remove()},1200)},3000);
